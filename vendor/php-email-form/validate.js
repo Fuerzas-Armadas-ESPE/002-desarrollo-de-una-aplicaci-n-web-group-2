@@ -1,77 +1,53 @@
-(function () {
-  "use strict";
-  
-  let action = 'contact.php';
+document.addEventListener('DOMContentLoaded', function () {
+  var mobileMenu = document.querySelector('.rd-mobilemenu');
+  var toggleButton = document.querySelector('.rd-mobilepanel_toggle');
 
-  let forms = document.querySelectorAll('.php-email-form');
+  toggleButton.addEventListener('click', function () {
+      // Agregar o remover la clase 'active' al menú y al botón cuando se hace clic en el botón
+      mobileMenu.classList.toggle('active');
+      this.classList.toggle('active');
+  });
+});
 
-  forms.forEach(function (e) {
-    e.addEventListener('submit', function (event) {
+window.addEventListener('scroll', function () {
+  var header = document.querySelector('.desplaza');
+  var scrollPosition = window.scrollY;
+
+  if (scrollPosition > 0) {
+      header.classList.add('fixed');
+      setTimeout(function () {
+          header.classList.add('show');
+      }, 1); // Necesario para que la animación funcione
+  } else {
+      header.classList.remove('show');
+      setTimeout(function () {
+          if (window.scrollY === 0) {
+              header.classList.remove('fixed');
+          }
+      }, 300); // Debe coincidir con la duración de la transición en CSS
+  }
+});
+
+const btn = document.getElementById('button');
+
+document.getElementById('form')
+  .addEventListener('submit', function (event) {
       event.preventDefault();
 
-      let thisForm = this;
+      btn.value = 'Enviando...';
 
-      let recaptcha = thisForm.getAttribute('data-recaptcha-site-key');
+      const serviceID = 'default_service';
+      const templateID = 'template_pphwu3t';
 
-      thisForm.querySelector('.loading').classList.add('d-block');
-      thisForm.querySelector('.error-message').classList.remove('d-block');
-      thisForm.querySelector('.sent-message').classList.remove('d-block');
-
-      let formData = new FormData(thisForm);
-
-      if (recaptcha) {
-        if (typeof grecaptcha !== "undefined") {
-          grecaptcha.ready(function () {
-            try {
-              grecaptcha.execute(recaptcha, { action: 'php_email_form_submit' })
-                .then(token => {
-                  formData.set('recaptcha-response', token);
-                  ajaxSubmitForm(thisForm, action, formData);
-                })
-            } catch (error) {
-              displayError(thisForm, error);
-            }
+      emailjs.sendForm(serviceID, templateID, this)
+          .then(() => {
+              btn.value = 'Enviar';
+              alert('Mensaje enviado correctamente!');
+          }, (err) => {
+              btn.value = 'Enviar';
+              alert(JSON.stringify(err));
           });
-        } else {
-          displayError(thisForm, 'The reCaptcha javascript API url is not loaded!')
-        }
-      } else {
-        ajaxSubmitForm(thisForm, action, formData);
-      }
-    });
+
+      this.reset();
   });
 
-  function ajaxSubmitForm(thisForm, action, formData) {
-    fetch(action, {
-      method: 'POST',
-      body: formData,
-      headers: { 'X-Requested-With': 'XMLHttpRequest' }
-    })
-      .then(response => {
-        if (response.ok) {
-          return response.text();
-        } else {
-          throw new Error(`${response.status} ${response.statusText} ${response.url}`);
-        }
-      })
-      .then(data => {
-        thisForm.querySelector('.loading').classList.remove('d-block');
-        if (data.trim() == 'OK') {
-          thisForm.querySelector('.sent-message').classList.add('d-block');
-          thisForm.reset();
-        } else {
-          throw new Error(data ? data : 'Form submission failed and no error message returned from: ' + action);
-        }
-      })
-      .catch((error) => {
-        displayError(thisForm, error);
-      });
-  }
-
-  function displayError(thisForm, error) {
-    thisForm.querySelector('.loading').classList.remove('d-block');
-    thisForm.querySelector('.error-message').innerHTML = error;
-    thisForm.querySelector('.error-message').classList.add('d-block');
-  }
-
-})();
