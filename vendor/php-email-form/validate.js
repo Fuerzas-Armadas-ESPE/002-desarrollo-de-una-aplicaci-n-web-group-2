@@ -1,53 +1,36 @@
-document.addEventListener('DOMContentLoaded', function () {
-  var mobileMenu = document.querySelector('.rd-mobilemenu');
-  var toggleButton = document.querySelector('.rd-mobilepanel_toggle');
+$(document).ready(function() {
+    $('.php-email-form').submit(function(e) {
+        e.preventDefault(); // Evita el envío del formulario normal
 
-  toggleButton.addEventListener('click', function () {
-      // Agregar o remover la clase 'active' al menú y al botón cuando se hace clic en el botón
-      mobileMenu.classList.toggle('active');
-      this.classList.toggle('active');
-  });
+        var form = $(this);
+        var formData = form.serialize(); // Serializa los datos del formulario
+
+        $.ajax({
+            type: 'POST',
+            url: form.attr('action'), // URL especificada en el atributo 'action' del formulario
+            data: formData,
+            dataType: 'json', // Esperamos una respuesta JSON del servidor
+            beforeSend: function() {
+                // Muestra un mensaje de carga mientras se procesa el formulario
+                form.find('.loading').css('display', 'block');
+            },
+            success: function(response) {
+                // Maneja la respuesta exitosa del servidor
+                console.log(response);
+                // Puedes mostrar un mensaje de éxito al usuario o redirigirlo a una página de agradecimiento
+                form.find('.sent-message').css('display', 'block');
+                form.find('.error-message').css('display', 'none');
+                form.find('.loading').css('display', 'none');
+                form[0].reset(); // Limpia el formulario después del envío exitoso
+            },
+            error: function(xhr, status, error) {
+                // Maneja el error en caso de que falle la solicitud AJAX
+                console.error(xhr.responseText);
+                // Puedes mostrar un mensaje de error al usuario o realizar otra acción apropiada
+                form.find('.error-message').css('display', 'block').text('Error: ' + xhr.responseText);
+                form.find('.sent-message').css('display', 'none');
+                form.find('.loading').css('display', 'none');
+            }
+        });
+    });
 });
-
-window.addEventListener('scroll', function () {
-  var header = document.querySelector('.desplaza');
-  var scrollPosition = window.scrollY;
-
-  if (scrollPosition > 0) {
-      header.classList.add('fixed');
-      setTimeout(function () {
-          header.classList.add('show');
-      }, 1); // Necesario para que la animación funcione
-  } else {
-      header.classList.remove('show');
-      setTimeout(function () {
-          if (window.scrollY === 0) {
-              header.classList.remove('fixed');
-          }
-      }, 300); // Debe coincidir con la duración de la transición en CSS
-  }
-});
-
-const btn = document.getElementById('button');
-
-document.getElementById('form')
-  .addEventListener('submit', function (event) {
-      event.preventDefault();
-
-      btn.value = 'Enviando...';
-
-      const serviceID = 'default_service';
-      const templateID = 'template_pphwu3t';
-
-      emailjs.sendForm(serviceID, templateID, this)
-          .then(() => {
-              btn.value = 'Enviar';
-              alert('Mensaje enviado correctamente!');
-          }, (err) => {
-              btn.value = 'Enviar';
-              alert(JSON.stringify(err));
-          });
-
-      this.reset();
-  });
-
