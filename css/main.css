@@ -160,8 +160,9 @@ h6 {
 }
 
 .header .logo img {
-  max-height: 36px;
+  max-height: 80px;
   margin-right: 8px;
+  filter: brightness(3.5);
 }
 
 .header .logo h1 {
