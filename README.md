@@ -71,5 +71,6 @@ Requisitos del Sistema
 Visual Studio Code: Entorno de desarrollo.
 Navegador Web: Cualquier navegador moderno que soporte HTML5, CSS y JavaScript.
 Servicio de Correo: Integración con proveedores de servicios de correo como Gmail, a través de EmailJS.
-Enlace a la aplicación web desplegada en Github Pages
+Enlace a la aplicación web desplegada en Github Pages.
+
 Este archivo README proporciona una visión detallada del proyecto QE, destacando las funcionalidades, las decisiones de diseño y desarrollo, y la guía uso.
